@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if ! command -v corda-cli &> /dev/null
+then
+    echo "corda_cli could not be found"
+    exit
+fi
+
 echo "--Step 1: Building projects."
 ./gradlew clean build
 
@@ -10,12 +16,10 @@ echo "--Step 3: Creating docker compose yaml file."
 corda-cli network deploy -n template-network -f c5cordapp-template.yaml -t 5.0.0-devpreview-rc03 > docker-compose.yaml
 
 echo "--Step 4: Configure the network"
-coroa-cli network config docker-compose template-network
+corda-cli network config docker-compose template-network
 
 echo "--Step 5: Starting docker containers."
 docker-compose -f docker-compose.yaml up -d
 
 echo "--Nodes Status: "
 corda-cli network status -n template-network
-
-
